@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+    <!-- Meta Properties -->
+    <meta charset="UTF-8">
+    <title>Agar כיתתי</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css" />
+    <!-- Audio -->
+    <audio id="split_cell" src="audio/split.mp3"></audio>
+    <audio id="spawn_cell" src="audio/spawn.mp3"></audio>
+</head>
+<body>
+    <div id="gameAreaWrapper">
+        <div id="status"><span class="title">טבלת מובילים</span></div>
+        <div class="chatbox" id="chatbox">
+            <ul id="chatList" class="chat-list"></ul>
+            <input id="chatInput" type="text" class="chat-input" placeholder="כתוב כאן..." maxlength="35" />
+        </div>
+        <div id="mobile">
+           <input type="image" id="split" class="split" src="img/split.png" alt="splitBtn">
+           <input type="image" id="feed" class="feed" src="img/feed.png" alt="feedBtn">
+        </div>
+        <canvas tabindex="1" id="cvs"></canvas>
+    </div>
+    <!-- הוראות לפני כניסה — נסגר רק אחרי לחיצת «אוקיי» -->
+    <div id="preGameOverlay" class="pre-game-overlay" role="dialog" aria-labelledby="preGameTitle">
+        <div class="pre-game-card">
+            <h1 id="preGameTitle" class="pre-game-title">Agar כיתתי — הוראות משחק</h1>
+
+            <section class="pre-game-section">
+                <h2>מטרת המשחק</h2>
+                <p>להפוך לעיגול הגדול ביותר במפה.</p>
+            </section>
+
+            <section class="pre-game-section">
+                <h2>איך זזים?</h2>
+                <p><strong>מחשב:</strong> מזיזים את העכבר.</p>
+                <p><strong>טלפון:</strong> נוגעים או גוררים על המסך.</p>
+                <p>העיגול נע לכיוון הסמן או האצבע.</p>
+            </section>
+
+            <section class="pre-game-section">
+                <h2>איך גדלים?</h2>
+                <p>אוכלים:</p>
+                <ul>
+                    <li>נקודות צבעוניות קטנות</li>
+                    <li>שחקנים קטנים מכם</li>
+                </ul>
+                <p>ככל שאוכלים יותר — גדלים יותר.</p>
+            </section>
+
+            <section class="pre-game-section">
+                <h2>חוק חשוב — גדול אוכל קטן</h2>
+                <p>אם שחקן גדול מכם נוגע בכם — הוא בולע אתכם.</p>
+            </section>
+
+            <section class="pre-game-section">
+                <h2>מה קורה כשגדלים?</h2>
+                <p>אתם נהיים חזקים יותר, אבל גם איטיים יותר.</p>
+                <p><strong>שחקנים קטנים:</strong> מהירים יותר ויכולים לברוח בקלות.</p>
+            </section>
+
+            <section class="pre-game-section">
+                <h2>הווירוסים הירוקים</h2>
+                <p>העיגולים הירוקים עם הקוצים הם וירוסים.</p>
+                <p>אם שחקן גדול נוגע בווירוס — הוא מתפצל להרבה חתיכות קטנות, ואז שחקנים אחרים יכולים לאכול אותו.</p>
+                <p>לפעמים וירוס הוא מלכודת.</p>
+            </section>
+
+            <section class="pre-game-section">
+                <h2>טבלת המובילים</h2>
+                <p>בצד המסך מופיעה טבלת השחקנים הגדולים ביותר כרגע. נסו להגיע אליה!</p>
+            </section>
+
+            <section class="pre-game-section">
+                <h2>צ'אט ועזרה</h2>
+                <p><strong>שימו לב:</strong> המשחק לא נעצר כשפותחים HELP או כותבים בצ'אט.</p>
+                <p>לפני שאתם קוראים או כותבים: התרחקו משחקנים גדולים ומצאו מקום בטוח.</p>
+            </section>
+
+            <section class="pre-game-section pre-game-tip">
+                <h2>טיפ חשוב</h2>
+                <p><strong>בהתחלה:</strong> אל תרדפו אחרי גדולים — אכלו נקודות, הישארו בתנועה והיזהרו מווירוסים.</p>
+                <p class="pre-game-bye">בהצלחה 🙂</p>
+            </section>
+
+            <button type="button" class="pre-game-ok" id="preGameOkButton">אוקיי, המשך</button>
+        </div>
+    </div>
+    <div id="startMenuWrapper">
+        <div id="startMenu">
+            <p class="game-title">Agar כיתתי</p>
+            <p class="classroom-notice">בחרו כינוי מכבד. המורה רואה את שמות השחקנים.</p>
+            <input type="text" tabindex="0" placeholder="כתוב כינוי" id="playerNameInput" maxlength="25" />
+            <b class="input-error">הכינוי יכול לכלול אותיות (גם עברית), ספרות וקו תחתון בלבד.</b>
+            <br />
+            <a onclick="document.getElementById('spawn_cell').play();"><button id="startButton">שחק</button></a>
+            <button id="spectateButton">צפייה</button>
+            <button id="settingsButton">הגדרות</button>
+            <br />
+            <div id="settings">
+                <h3>הגדרות</h3>
+                <ul>
+                    <label><input id="visBord" type="checkbox">הצג גבול</label>
+                    <label><input id="showMass" type="checkbox">הצג מסה</label>
+                    <br />
+                    <label><input id="continuity" type="checkbox">המשך תנועה כשהעכבר מחוץ למסך</label>
+                    <br />
+                    <label><input id="roundFood" type="checkbox" checked>מזון מעוגל</label>
+                    <label><input id="darkMode" type="checkbox">מצב כהה</label>
+                </ul>
+            </div>
+            <div id="instructions">
+                <h3>איך משחקים?</h3>
+                <ul>
+                    <li>זוזו עם העכבר או האצבע.</li>
+                    <li>אכלו נקודות כדי לגדול.</li>
+                    <li>שחקן גדול יכול לאכול שחקן קטן.</li>
+                    <li>המטרה: לשרוד ולגדול כמה שיותר.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- JS -->
+    <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

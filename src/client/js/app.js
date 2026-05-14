@@ -3,6 +3,7 @@ var render = require('./render');
 var ChatClient = require('./chat-client');
 var Canvas = require('./canvas');
 var global = require('./global');
+var qrcode = require('qrcode');
 
 var playerNameInput = document.getElementById('playerNameInput');
 var socket;
@@ -45,6 +46,19 @@ function validNick() {
     return regex.exec(playerNameInput.value) !== null;
 }
 
+// כתובת ב-QR: אם יש meta name="classroom-join-url" עם https — משתמשים בו (קבוע לכיתה). אחרת — כתובת הדף הנוכחית.
+function getClassroomJoinUrl() {
+    var meta = document.querySelector('meta[name="classroom-join-url"]');
+    var raw = meta && meta.getAttribute('content');
+    if (raw) {
+        raw = String(raw).trim();
+        if (raw && /^https?:\/\//i.test(raw)) {
+            return raw.replace(/\/+$/, '');
+        }
+    }
+    return String(window.location.origin || '').replace(/\/+$/, '');
+}
+
 window.onload = function () {
 
     var preGameOverlay = document.getElementById('preGameOverlay');
@@ -59,24 +73,25 @@ window.onload = function () {
     }
 
     (function initPreGameJoinQr() {
-        var joinUrl = window.location.origin + '/';
+        var joinUrl = getClassroomJoinUrl();
         var urlEl = document.getElementById('preGameJoinUrl');
         var canvas = document.getElementById('preGameQrCanvas');
         if (urlEl) {
             urlEl.textContent = joinUrl;
         }
-        if (canvas && typeof window.QRCode !== 'undefined') {
-            window.QRCode.toCanvas(canvas, joinUrl, {
+        if (canvas && qrcode && typeof qrcode.toCanvas === 'function') {
+            qrcode.toCanvas(canvas, joinUrl, {
+                errorCorrectionLevel: 'M',
                 margin: 2,
                 width: 160,
                 color: { dark: '#111111', light: '#ffffff' }
             }, function (err) {
                 if (err && urlEl) {
-                    urlEl.textContent = joinUrl + ' (QR: ' + (err.message || 'שגיאה') + ')';
+                    urlEl.textContent = joinUrl + ' — שגיאת QR: ' + (err.message || String(err));
                 }
             });
-        } else if (canvas && urlEl) {
-            urlEl.textContent = joinUrl;
+        } else if (urlEl) {
+            urlEl.textContent = joinUrl + (canvas ? '' : ' — אין אלמנט canvas ל-QR');
         }
     }());
 

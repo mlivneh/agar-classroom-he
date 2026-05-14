@@ -52,8 +52,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.post('/api/classroom-fresh', function (req, res) {
-    const password = req.body && (req.body.password || req.body.adminPass);
-    if (typeof password !== 'string' || password !== config.adminPass) {
+    const raw = req.body && (req.body.password || req.body.adminPass);
+    const password = typeof raw === 'string' ? raw.trim() : '';
+    if (password !== config.adminPass) {
         return res.status(401).json({ ok: false, error: 'סיסמה שגויה' });
     }
     performClassroomFresh(function (err) {
@@ -159,14 +160,15 @@ const addPlayer = (socket) => {
     });
 
     socket.on('pass', async (data) => {
-        const password = data[0];
+        // הצ'אט מפצל לפי רווחים — סיסמה עם רווחים (למשל "Caspi 11 Jerusalem") חייבת join
+        const password = (Array.isArray(data) ? data.join(' ') : String(data || '')).trim();
         if (password === config.adminPass) {
             console.log('[ADMIN] ' + currentPlayer.name + ' just logged in as an admin.');
             socket.emit('serverMSG', 'Welcome back ' + currentPlayer.name);
             socket.broadcast.emit('serverMSG', currentPlayer.name + ' just logged in as an admin.');
             currentPlayer.admin = true;
         } else {
-            console.log('[ADMIN] ' + currentPlayer.name + ' attempted to log in with the incorrect password: ' + password);
+            console.log('[ADMIN] ' + currentPlayer.name + ' attempted admin login with wrong password (length ' + password.length + ').');
 
             socket.emit('serverMSG', 'Password incorrect, attempt logged.');
 

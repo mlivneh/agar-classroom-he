@@ -24,67 +24,96 @@
         </div>
         <canvas tabindex="1" id="cvs"></canvas>
     </div>
-    <!-- הוראות לפני כניסה — נסגר רק אחרי לחיצת «אוקיי» -->
+    <!-- הוראות + QR לכיתה — נסגר אחרי «אוקיי, המשך» -->
     <div id="preGameOverlay" class="pre-game-overlay" role="dialog" aria-labelledby="preGameTitle">
         <div class="pre-game-card">
             <h1 id="preGameTitle" class="pre-game-title">Agar כיתתי — הוראות משחק</h1>
 
-            <section class="pre-game-section">
-                <h2>מטרת המשחק</h2>
-                <p>להפוך לעיגול הגדול ביותר במפה.</p>
-            </section>
+            <div class="pre-game-join-strip" aria-label="קישור להצטרפות ואיפוס למורה">
+                <p class="pre-game-qr-caption">סרקו עם הטלפון כדי להיכנס</p>
+                <div class="pre-game-qr-row">
+                    <div class="pre-game-qr-wrap">
+                        <canvas id="preGameQrCanvas" width="160" height="160" role="img" aria-label="קוד QR לכתובת המשחק"></canvas>
+                    </div>
+                </div>
+                <p class="pre-game-url" id="preGameJoinUrl"></p>
 
-            <section class="pre-game-section">
-                <h2>איך זזים?</h2>
-                <p><strong>מחשב:</strong> מזיזים את העכבר.</p>
-                <p><strong>טלפון:</strong> נוגעים או גוררים על המסך.</p>
-                <p>העיגול נע לכיוון הסמן או האצבע.</p>
-            </section>
+                <div class="teacher-reset-block teacher-reset-block--overlay" id="teacherResetBlock">
+                    <h3 class="teacher-reset-title">למורה</h3>
+                    <p class="teacher-reset-hint">איפוס מפה וניתוק כולם. הסיסמה מוצגת כנקודות — לא רואים את האותיות עד שמסמנים «הצג סיסמה». בזמן הקלדה על מסך מוקרן עדיין כדאי להזין מהטלפון או לחזור למצב מוסתר.</p>
+                    <div class="teacher-reset-row">
+                        <input type="password" id="teacherResetPass" placeholder="סיסמת מנהל" maxlength="200" autocomplete="off" />
+                        <button type="button" id="teacherResetButton" aria-label="איפוס כיתה לאחר הזנת סיסמת מנהל">אפס</button>
+                    </div>
+                    <label class="teacher-reset-show"><input type="checkbox" id="teacherResetShowPass" /> הצג סיסמה (לא כשמקרינים לכיתה)</label>
+                    <p class="teacher-reset-msg" id="teacherResetMsg" aria-live="polite"></p>
+                </div>
+            </div>
 
-            <section class="pre-game-section">
-                <h2>איך גדלים?</h2>
-                <p>אוכלים:</p>
-                <ul>
-                    <li>נקודות צבעוניות קטנות</li>
-                    <li>שחקנים קטנים מכם</li>
-                </ul>
-                <p>ככל שאוכלים יותר — גדלים יותר.</p>
-            </section>
+            <div class="pre-game-instructions">
+                    <section class="pre-game-section">
+                        <h2>מטרת המשחק</h2>
+                        <p>להפוך לעיגול הגדול ביותר במפה.</p>
+                    </section>
 
-            <section class="pre-game-section">
-                <h2>חוק חשוב — גדול אוכל קטן</h2>
-                <p>אם שחקן גדול מכם נוגע בכם — הוא בולע אתכם.</p>
-            </section>
+                    <section class="pre-game-section">
+                        <h2>איך זזים?</h2>
+                        <p><strong>מחשב:</strong> מזיזים את העכבר.</p>
+                        <p><strong>טלפון:</strong> נוגעים או גוררים על המסך.</p>
+                        <p>העיגול נע לכיוון הסמן או האצבע.</p>
+                    </section>
 
-            <section class="pre-game-section">
-                <h2>מה קורה כשגדלים?</h2>
-                <p>אתם נהיים חזקים יותר, אבל גם איטיים יותר.</p>
-                <p><strong>שחקנים קטנים:</strong> מהירים יותר ויכולים לברוח בקלות.</p>
-            </section>
+                    <section class="pre-game-section">
+                        <h2>פיצול (Split)</h2>
+                        <p><strong>מחשב:</strong> לחיצה על מקש הרווח (Space) מפצלת את העיגול שלכם לשניים — כשיש מספיק מסה. אפשר גם בכפתור הפיצול על המסך.</p>
+                        <p><strong>טלפון:</strong> משתמשים בכפתור הפיצול.</p>
+                    </section>
 
-            <section class="pre-game-section">
-                <h2>הווירוסים הירוקים</h2>
-                <p>העיגולים הירוקים עם הקוצים הם וירוסים.</p>
-                <p>אם שחקן גדול נוגע בווירוס — הוא מתפצל להרבה חתיכות קטנות, ואז שחקנים אחרים יכולים לאכול אותו.</p>
-                <p>לפעמים וירוס הוא מלכודת.</p>
-            </section>
+                    <section class="pre-game-section">
+                        <h2>איך גדלים?</h2>
+                        <p>אוכלים:</p>
+                        <ul>
+                            <li>נקודות צבעוניות קטנות</li>
+                            <li>שחקנים קטנים מכם</li>
+                        </ul>
+                        <p>ככל שאוכלים יותר — גדלים יותר.</p>
+                    </section>
 
-            <section class="pre-game-section">
-                <h2>טבלת המובילים</h2>
-                <p>בצד המסך מופיעה טבלת השחקנים הגדולים ביותר כרגע. נסו להגיע אליה!</p>
-            </section>
+                    <section class="pre-game-section">
+                        <h2>חוק חשוב — גדול אוכל קטן</h2>
+                        <p>אם שחקן גדול מכם נוגע בכם — הוא בולע אתכם.</p>
+                    </section>
 
-            <section class="pre-game-section">
-                <h2>צ'אט ועזרה</h2>
-                <p><strong>שימו לב:</strong> המשחק לא נעצר כשפותחים HELP או כותבים בצ'אט.</p>
-                <p>לפני שאתם קוראים או כותבים: התרחקו משחקנים גדולים ומצאו מקום בטוח.</p>
-            </section>
+                    <section class="pre-game-section">
+                        <h2>מה קורה כשגדלים?</h2>
+                        <p>אתם נהיים חזקים יותר, אבל גם איטיים יותר.</p>
+                        <p><strong>שחקנים קטנים:</strong> מהירים יותר ויכולים לברוח בקלות.</p>
+                    </section>
 
-            <section class="pre-game-section pre-game-tip">
-                <h2>טיפ חשוב</h2>
-                <p><strong>בהתחלה:</strong> אל תרדפו אחרי גדולים — אכלו נקודות, הישארו בתנועה והיזהרו מווירוסים.</p>
-                <p class="pre-game-bye">בהצלחה 🙂</p>
-            </section>
+                    <section class="pre-game-section">
+                        <h2>הווירוסים הירוקים</h2>
+                        <p>העיגולים הירוקים עם הקוצים הם וירוסים.</p>
+                        <p>אם שחקן גדול נוגע בווירוס — הוא מתפצל להרבה חתיכות קטנות, ואז שחקנים אחרים יכולים לאכול אותו.</p>
+                        <p>לפעמים וירוס הוא מלכודת.</p>
+                    </section>
+
+                    <section class="pre-game-section">
+                        <h2>טבלת המובילים</h2>
+                        <p>בצד המסך מופיעה טבלת השחקנים הגדולים ביותר כרגע. נסו להגיע אליה!</p>
+                    </section>
+
+                    <section class="pre-game-section">
+                        <h2>צ'אט ועזרה</h2>
+                        <p><strong>שימו לב:</strong> המשחק לא נעצר כשפותחים HELP או כותבים בצ'אט.</p>
+                        <p>לפני שאתם קוראים או כותבים: התרחקו משחקנים גדולים ומצאו מקום בטוח.</p>
+                    </section>
+
+                    <section class="pre-game-section pre-game-tip">
+                        <h2>טיפ חשוב</h2>
+                        <p><strong>בהתחלה:</strong> אל תרדפו אחרי גדולים — אכלו נקודות, הישארו בתנועה והיזהרו מווירוסים.</p>
+                        <p class="pre-game-bye">בהצלחה 🙂</p>
+                    </section>
+            </div>
 
             <button type="button" class="pre-game-ok" id="preGameOkButton">אוקיי, המשך</button>
         </div>
@@ -93,6 +122,7 @@
         <div id="startMenu">
             <p class="game-title">Agar כיתתי</p>
             <p class="classroom-notice">בחרו כינוי מכבד. המורה רואה את שמות השחקנים.</p>
+
             <input type="text" tabindex="0" placeholder="כתוב כינוי" id="playerNameInput" maxlength="25" />
             <b class="input-error">הכינוי יכול לכלול אותיות (גם עברית), ספרות וקו תחתון בלבד.</b>
             <br />
@@ -118,12 +148,14 @@
                     <li>זוזו עם העכבר או האצבע.</li>
                     <li>אכלו נקודות כדי לגדול.</li>
                     <li>שחקן גדול יכול לאכול שחקן קטן.</li>
+                    <li><strong>מחשב:</strong> מקש רווח (Space) מפצל את העיגול לשניים (כשיש מספיק מסה); בטלפון — כפתור הפיצול.</li>
                     <li>המטרה: לשרוד ולגדול כמה שיותר.</li>
                 </ul>
             </div>
         </div>
     </div>
-    <!-- JS -->
+    <!-- JS — QR לכתובת האתר (ספרייה לקוחית, ללא קריאה חיצונית) -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
     <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
     <script src="js/app.js"></script>
 </body>

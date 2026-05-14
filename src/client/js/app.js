@@ -58,6 +58,28 @@ window.onload = function () {
         };
     }
 
+    (function initPreGameJoinQr() {
+        var joinUrl = window.location.origin + '/';
+        var urlEl = document.getElementById('preGameJoinUrl');
+        var canvas = document.getElementById('preGameQrCanvas');
+        if (urlEl) {
+            urlEl.textContent = joinUrl;
+        }
+        if (canvas && typeof window.QRCode !== 'undefined') {
+            window.QRCode.toCanvas(canvas, joinUrl, {
+                margin: 2,
+                width: 160,
+                color: { dark: '#111111', light: '#ffffff' }
+            }, function (err) {
+                if (err && urlEl) {
+                    urlEl.textContent = joinUrl + ' (QR: ' + (err.message || 'שגיאה') + ')';
+                }
+            });
+        } else if (canvas && urlEl) {
+            urlEl.textContent = joinUrl;
+        }
+    }());
+
     var btn = document.getElementById('startButton'),
         btnS = document.getElementById('spectateButton'),
         nickErrorText = document.querySelector('#startMenu .input-error');
@@ -87,6 +109,47 @@ window.onload = function () {
             settings.style.maxHeight = '300px';
         }
     };
+
+    var teacherBtn = document.getElementById('teacherResetButton');
+    var teacherPass = document.getElementById('teacherResetPass');
+    var teacherMsg = document.getElementById('teacherResetMsg');
+    var teacherShow = document.getElementById('teacherResetShowPass');
+    if (teacherShow && teacherPass) {
+        teacherShow.onchange = function () {
+            teacherPass.type = teacherShow.checked ? 'text' : 'password';
+        };
+    }
+    if (teacherBtn && teacherPass && teacherMsg) {
+        teacherBtn.onclick = function () {
+            var pw = teacherPass.value;
+            teacherMsg.textContent = '';
+            teacherBtn.disabled = true;
+            fetch('/api/classroom-fresh', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: pw })
+            }).then(function (r) {
+                return r.json().then(function (j) {
+                    return { ok: r.ok, body: j };
+                });
+            }).then(function (x) {
+                if (x.ok && x.body.ok) {
+                    teacherMsg.textContent = x.body.message || 'הכיתה אופסה.';
+                    teacherPass.value = '';
+                    if (teacherShow) {
+                        teacherShow.checked = false;
+                        teacherPass.type = 'password';
+                    }
+                } else {
+                    teacherMsg.textContent = (x.body && x.body.error) ? x.body.error : ('שגיאה ' + (x.ok ? '' : 'שרת'));
+                }
+            }).catch(function (err) {
+                teacherMsg.textContent = 'שגיאת רשת: ' + (err.message || String(err));
+            }).then(function () {
+                teacherBtn.disabled = false;
+            });
+        };
+    }
 
     playerNameInput.addEventListener('keypress', function (e) {
         var key = e.which || e.keyCode;

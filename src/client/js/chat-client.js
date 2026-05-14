@@ -53,7 +53,11 @@ class ChatClient {
             self.printHelp();
         });
 
-        this.registerCommand('login', 'התחברות כמנהל.', function (args) {
+        this.registerCommand('login', 'התחברות כמנהל (אחרי המילה: סיסמה מלאה, כולל רווחים).', function (args) {
+            self.socket.emit('pass', args);
+        });
+
+        this.registerCommand('pass', 'כמו -login — התחברות כמנהל.', function (args) {
             self.socket.emit('pass', args);
         });
 

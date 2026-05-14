@@ -19,8 +19,10 @@ module.exports = {
 	},
     gameWidth: 5000,
     gameHeight: 5000,
-    // Render / מקומי: Environment → ADMIN_PASS (לא לשמור סיסמה ב-Git)
-    adminPass: process.env.ADMIN_PASS || "DEFAULT",
+    // Render / מקומי: Environment → ADMIN_PASS (לא לשמור סיסמה ב-Git). trim — מונע רווח מזדמן מהעתקה ב-Render.
+    adminPass: (typeof process.env.ADMIN_PASS === 'string' && process.env.ADMIN_PASS.trim() !== '')
+        ? process.env.ADMIN_PASS.trim()
+        : 'DEFAULT',
     gameMass: 20000,
     maxFood: 1000,
     maxVirus: 50,

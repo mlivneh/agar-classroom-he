@@ -14,6 +14,7 @@ const config = require('../../config');
 const util = require('./lib/util');
 const mapUtils = require('./map/map');
 const {getPosition} = require("./lib/entityUtils");
+const classroomReset = require('./classroom-reset');
 
 let map = new mapUtils.Map(config);
 
@@ -25,6 +26,44 @@ let leaderboard = [];
 let leaderboardChanged = false;
 
 const Vector = SAT.Vector;
+
+function performClassroomFresh(callback) {
+    const reason = 'המורה איפס את הכיתה. רעננו את הדף והתחברו מחדש.';
+    Object.keys(sockets).forEach(function (id) {
+        try {
+            const s = sockets[id];
+            if (s && s.connected) {
+                s.emit('kick', reason);
+                s.disconnect(true);
+            }
+        } catch (e) {
+            console.error('[classroom-fresh] disconnect', e);
+        }
+    });
+    sockets = {};
+    spectators = [];
+    map = new mapUtils.Map(config);
+    leaderboard = [];
+    leaderboardChanged = true;
+    classroomReset.clearClassroomTables(callback);
+}
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+app.post('/api/classroom-fresh', function (req, res) {
+    const password = req.body && (req.body.password || req.body.adminPass);
+    if (typeof password !== 'string' || password !== config.adminPass) {
+        return res.status(401).json({ ok: false, error: 'סיסמה שגויה' });
+    }
+    performClassroomFresh(function (err) {
+        if (err) {
+            return res.status(500).json({ ok: false, error: 'ניקוי מסד נתונים נכשל' });
+        }
+        console.log('[INFO] Classroom fresh (HTTP).');
+        res.json({ ok: true, message: 'הכיתה אופסה. כל השחקנים נותקו.' });
+    });
+});
 
 app.use(express.static(__dirname + '/../client'));
 
